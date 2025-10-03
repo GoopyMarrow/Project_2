@@ -1,4 +1,4 @@
-# --- 5. FUNCIÓN PRINCIPAL ---
+# 5. Main
 def main():
     DATA_FILE = 'Binance_BTCUSDT_1h.csv'
     INITIAL_CASH = 1_000_000;
