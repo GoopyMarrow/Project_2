@@ -2,7 +2,7 @@ import pandas as pd
 import ta
 
 def calculate_indicators(df: pd.DataFrame, params: dict) -> pd.DataFrame:
-    """Calcula y añade los indicadores técnicos al DataFrame."""
+    """Añadir documentacion"""
     df_copy = df.copy()
     df_copy['rsi'] = ta.momentum.RSIIndicator(df_copy['Close'], window=params['rsi_window']).rsi()
     bollinger = ta.volatility.BollingerBands(df_copy['Close'], window=params['bb_window'], window_dev=2)
@@ -22,7 +22,7 @@ def calculate_indicators(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     return df_copy.dropna()
 
 def generate_signals(df: pd.DataFrame, params: dict) -> pd.DataFrame:
-    """Genera señales de compra y venta basadas en el consenso de los indicadores."""
+    """Añadir documentacion"""
     df_copy = df.copy()
     rsi_buy = df_copy['rsi'] < params['rsi_lower']
     rsi_sell = df_copy['rsi'] > params['rsi_upper']
