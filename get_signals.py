@@ -1,8 +1,19 @@
 import pandas as pd
 import ta
 
+
 def calculate_indicators(df: pd.DataFrame, params: dict) -> pd.DataFrame:
-    """Añadir documentacion"""
+    """
+    Calcula un conjunto de indicadores técnicos (RSI, Bollinger, Stochastic, MACD)
+    y los añade como columnas a un DataFrame.
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de precios (OHLC).
+        params (dict): Diccionario con los parámetros para cada indicador.
+
+    Returns:
+        pd.DataFrame: El DataFrame original con las nuevas columnas de indicadores.
+    """
     df_copy = df.copy()
     df_copy['rsi'] = ta.momentum.RSIIndicator(df_copy['Close'], window=params['rsi_window']).rsi()
     bollinger = ta.volatility.BollingerBands(df_copy['Close'], window=params['bb_window'], window_dev=2)
@@ -21,8 +32,22 @@ def calculate_indicators(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     df_copy['macd_signal_line'] = macd.macd_signal()
     return df_copy.dropna()
 
+
 def generate_signals(df: pd.DataFrame, params: dict) -> pd.DataFrame:
-    """Añadir documentacion"""
+    """
+    Genera señales de compra ('buy_signal') y venta ('sell_signal') cuando los
+    indicadores coinciden.
+
+    Una señal se activa si al menos 2 de los 4 indicadores coinciden.
+
+    Args:
+        df (pd.DataFrame): DataFrame que ya contiene las columnas de indicadores.
+        params (dict): Diccionario con los umbrales para generar las señales.
+
+    Returns:
+        pd.DataFrame: El DataFrame con dos nuevas columnas booleanas:
+        'buy_signal' y 'sell_signal'.
+    """
     df_copy = df.copy()
     rsi_buy = df_copy['rsi'] < params['rsi_lower']
     rsi_sell = df_copy['rsi'] > params['rsi_upper']
