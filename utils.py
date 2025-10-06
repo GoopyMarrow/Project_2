@@ -16,11 +16,7 @@ def load_and_split_data(file_path: str, train_ratio: float, test_ratio: float):
         DataFrames de entrenamiento, prueba y validación. Retorna None si el
         archivo no se encuentra.
     """
-    try:
-        data = pd.read_csv(file_path, skiprows=1)
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo '{file_path}'.")
-        return None, None, None
+    data = pd.read_csv(file_path, skiprows=1)
 
     data['Date'] = pd.to_datetime(data['Date'], format='mixed')
     data = data.set_index('Date').sort_index()
