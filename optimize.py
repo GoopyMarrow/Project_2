@@ -6,12 +6,15 @@ from backtesting import run_backtest
 from metrics import calculate_calmar_for_optimization
 
 
-def get_params_from_trial(trial):
+def get_params_from_trial(trial: optuna.trial.Trial) -> dict:
     """
-    Define el espacio de búsqueda de hiperparámetros para un `trial` de Optuna.
+    Define el espacio de búsqueda de hiperparámetros para una prueba de Optuna.
+
+    Args:
+        trial (optuna.trial.Trial): Objeto de Optuna que sugiere los valores.
 
     Returns:
-        dict: Un diccionario con un conjunto de parámetros sugeridos para una prueba.
+        dict: Un diccionario con un conjunto de parámetros sugeridos para la prueba.
     """
     return {
         'rsi_window': trial.suggest_int('rsi_window', 5, 50),
@@ -27,14 +30,26 @@ def get_params_from_trial(trial):
         'macd_signal_window': trial.suggest_int('macd_signal_window', 5, 50),
         'stop_loss': trial.suggest_float('stop_loss', 0.01, 0.15),
         'take_profit': trial.suggest_float('take_profit', 0.01, 0.15),
-        'n_shares': trial.suggest_float('n_shares', 0.001, 2.0, step=0.001),
+        # 'n_shares': trial.suggest_float('n_shares', 0.5, 10.0), # No funciona tan bien
+        'pct_cash': trial.suggest_float('pct_cash', 0.001, 0.250, step= 0.001), # Funciona mejor
         'max_short_pct': trial.suggest_float('max_short_pct', 0.1, 0.5)
     }
 
 
-def objective(trial: optuna.trial.Trial, data: pd.DataFrame, n_splits: int):
+def objective(trial: optuna.trial.Trial, data: pd.DataFrame, n_splits: int) -> float:
     """
-    Función objetivo que Optuna maximiza, usando la metodología walk-forward.
+    Función objetivo que Optuna evalúa y maximiza, usando validación cruzada.
+
+    Aplica la estrategia con los parámetros del `trial` sobre múltiples ventanas
+    de tiempo y retorna el promedio del Calmar Ratio.
+
+    Args:
+        trial (optuna.trial.Trial): La prueba actual de Optuna.
+        data (pd.DataFrame): El set de datos de entrenamiento.
+        n_splits (int): Número de divisiones para la validación cruzada (walk-forward).
+
+    Returns:
+        float: El valor promedio de la métrica (Calmar Ratio) en todas las divisiones.
     """
     tscv = TimeSeriesSplit(n_splits=n_splits)
     results = []
@@ -51,9 +66,17 @@ def objective(trial: optuna.trial.Trial, data: pd.DataFrame, n_splits: int):
     return np.mean(results)
 
 
-def run_optimization(train_df: pd.DataFrame, n_trials: int, n_splits: int):
+def run_optimization(train_df: pd.DataFrame, n_trials: int, n_splits: int) -> optuna.study.Study:
     """
-    Configura y ejecuta el estudio de optimización de Optuna.
+    Configura y ejecuta el estudio de optimización de hiperparámetros.
+
+    Args:
+        train_df (pd.DataFrame): El set de datos de entrenamiento.
+        n_trials (int): Número de pruebas que realizará Optuna.
+        n_splits (int): Número de divisiones para el walk-forward.
+
+    Returns:
+        optuna.study.Study: El objeto de estudio de Optuna con todos los resultados.
     """
     print("\nIniciando optimización walk-forward...")
     study = optuna.create_study(direction='maximize')
