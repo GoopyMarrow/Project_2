@@ -55,7 +55,7 @@ def calculate_full_performance_metrics(portfolio_values: pd.Series, trades_log: 
         return {'Calmar Ratio': 0.0, 'Sharpe Ratio': 0.0, 'Sortino Ratio': 0.0, 'Max Drawdown': 0.0, 'Win Rate': 0.0,
                 'Total Trades': len(trades_log), 'Annualized Return': 0.0}
 
-    # --- Cálculos de Métricas Estándar ---
+    # --- Cálculos de Métricas ---
     bars_per_year = (24 * 60 / time_frame_minutes) * 365
     annualized_return = returns.mean() * bars_per_year
     annualized_std_dev = returns.std() * np.sqrt(bars_per_year)
@@ -89,3 +89,4 @@ def calculate_full_performance_metrics(portfolio_values: pd.Series, trades_log: 
         'Total Trades': len(trades_log)
     }
     return {key: round(value, 4) for key, value in metrics.items()}
+
