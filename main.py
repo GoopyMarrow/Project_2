@@ -1,5 +1,4 @@
 import pandas as pd
-
 from utils import load_and_split_data, display_final_results
 from optimize import run_optimization
 from backtesting import run_backtest
@@ -9,17 +8,27 @@ from plots import (
     plot_performance_vs_buy_and_hold
 )
 
-
 def main():
     """
-    Función principal que orquesta todo el proceso de backtesting y optimización.
+    Orquesta el proceso completo de backtesting y optimización de la estrategia.
+
+    El flujo de ejecución es el siguiente:
+    1.  Define las configuraciones iniciales (archivo de datos, capital, comisiones).
+    2.  Carga y divide los datos históricos en sets de entrenamiento, prueba y validación.
+    3.  Ejecuta la optimización de hiperparámetros en el set de entrenamiento
+        utilizando Optuna con validación cruzada (walk-forward).
+    4.  Imprime los mejores parámetros encontrados.
+    5.  Ejecuta el backtest final con los parámetros óptimos en cada uno de los
+        tres sets de datos (Train, Test, Validation).
+    6.  Muestra un reporte de métricas detallado para cada set.
+    7.  Genera y muestra las gráficas de rendimiento correspondientes.
     """
     # --- 1. Configuración ---
     DATA_FILE = 'Binance_BTCUSDT_1h.csv'
     INITIAL_CASH = 1_000_000
     COMMISSION = 0.00125
-    N_TRIALS = 250
-    N_SPLITS = 5
+    N_TRIALS = 250  # n pruebas
+    N_SPLITS = 5    # n Walk-Forward
 
     # --- 2. Carga y División de Datos ---
     train_df, test_df, validation_df = load_and_split_data(
@@ -48,7 +57,7 @@ def main():
     )
     display_final_results("Test", INITIAL_CASH, test_portfolio, test_log, best_params)
 
-    # Ejecución para VALIDATION SET
+    # Ejecución para VALIDATION SET (continúa con el capital de la fase de Test)
     _, validation_portfolio, validation_log, _ = run_backtest(
         validation_df, cash_after_test, COMMISSION, best_params
     )
@@ -63,6 +72,6 @@ def main():
     full_prices = pd.concat([test_df['Close'], validation_df['Close']])
     plot_performance_vs_buy_and_hold(full_test_validation_portfolio, full_prices, INITIAL_CASH)
 
-
 if __name__ == "__main__":
     main()
+
