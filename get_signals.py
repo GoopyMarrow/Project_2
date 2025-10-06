@@ -4,12 +4,12 @@ import ta
 
 def calculate_indicators(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     """
-    Calcula un conjunto de indicadores técnicos (RSI, Bollinger, Stochastic, MACD)
+    Calcula un conjunto de indicadores técnicos (RSI, Bollinger Bands, Stochastic, MACD)
     y los añade como columnas a un DataFrame.
 
     Args:
         df (pd.DataFrame): DataFrame con datos de precios (OHLC).
-        params (dict): Diccionario con los parámetros para cada indicador.
+        params (dict): Diccionario con los parámetros (ventanas, etc.) para cada indicador.
 
     Returns:
         pd.DataFrame: El DataFrame original con las nuevas columnas de indicadores.
@@ -35,10 +35,11 @@ def calculate_indicators(df: pd.DataFrame, params: dict) -> pd.DataFrame:
 
 def generate_signals(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     """
-    Genera señales de compra ('buy_signal') y venta ('sell_signal') cuando los
-    indicadores coinciden.
+    Genera señales de compra ('buy_signal') y venta ('sell_signal') basadas
+    en el consenso de múltiples indicadores.
 
-    Una señal se activa si al menos 2 de los 4 indicadores coinciden.
+    Una señal se activa si al menos 2 de los 4 indicadores (RSI, BB, Stoch, MACD)
+    están de acuerdo.
 
     Args:
         df (pd.DataFrame): DataFrame que ya contiene las columnas de indicadores.
