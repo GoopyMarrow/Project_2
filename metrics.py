@@ -3,7 +3,10 @@ import numpy as np
 
 
 def calculate_calmar_for_optimization(portfolio_values: pd.Series) -> float:
-    """Añadir documentacion"""
+    """
+    Calcula únicamente el Calmar Ratio.
+    Es una versión ligera para ser usada eficientemente durante la optimización.
+    """
     if portfolio_values.empty or portfolio_values.nunique() < 2:
         return -1.0
     returns = portfolio_values.pct_change().dropna()
@@ -18,7 +21,9 @@ def calculate_calmar_for_optimization(portfolio_values: pd.Series) -> float:
 
 
 def calculate_full_performance_metrics(portfolio_values: pd.Series, trades_log: list, time_frame_minutes: int) -> dict:
-    """Añadir documentacion"""
+    """
+    Calcula un diccionario completo con las métricas de desempeño de la estrategia.
+    """
     if portfolio_values.empty or len(trades_log) == 0:
         return {'Calmar Ratio': 0.0, 'Sharpe Ratio': 0.0, 'Sortino Ratio': 0.0, 'Max Drawdown': 0.0, 'Win Rate': 0.0,
                 'Total Trades': 0, 'Annualized Return': 0.0}
@@ -47,3 +52,4 @@ def calculate_full_performance_metrics(portfolio_values: pd.Series, trades_log: 
         'Max Drawdown': max_drawdown, 'Win Rate': win_rate, 'Total Trades': len(trades_log)
     }
     return {key: round(value, 4) for key, value in metrics.items()}
+
