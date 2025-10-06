@@ -1,12 +1,18 @@
 import optuna
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import TimeSeriesSplit
 from backtesting import run_backtest
 from metrics import calculate_calmar_for_optimization
 
 
 def get_params_from_trial(trial):
-    """Añade documentacion"""
+    """
+    Define el espacio de búsqueda de hiperparámetros para un `trial` de Optuna.
+
+    Returns:
+        dict: Un diccionario con un conjunto de parámetros sugeridos para una prueba.
+    """
     return {
         'rsi_window': trial.suggest_int('rsi_window', 5, 50),
         'rsi_lower': trial.suggest_int('rsi_lower', 5, 35),
@@ -21,13 +27,15 @@ def get_params_from_trial(trial):
         'macd_signal_window': trial.suggest_int('macd_signal_window', 5, 50),
         'stop_loss': trial.suggest_float('stop_loss', 0.01, 0.15),
         'take_profit': trial.suggest_float('take_profit', 0.01, 0.15),
-        'n_shares': trial.suggest_float('n_shares', 0.5, 10.0),
+        'n_shares': trial.suggest_float('n_shares', 0.001, 2.0, step=0.001),
         'max_short_pct': trial.suggest_float('max_short_pct', 0.1, 0.5)
     }
 
 
 def objective(trial: optuna.trial.Trial, data: pd.DataFrame, n_splits: int):
-    """Añadir documentacion"""
+    """
+    Función objetivo que Optuna maximiza, usando la metodología walk-forward.
+    """
     tscv = TimeSeriesSplit(n_splits=n_splits)
     results = []
     params = get_params_from_trial(trial)
@@ -44,7 +52,9 @@ def objective(trial: optuna.trial.Trial, data: pd.DataFrame, n_splits: int):
 
 
 def run_optimization(train_df: pd.DataFrame, n_trials: int, n_splits: int):
-    """Añadir documentacion"""
+    """
+    Configura y ejecuta el estudio de optimización de Optuna.
+    """
     print("\nIniciando optimización walk-forward...")
     study = optuna.create_study(direction='maximize')
     study.optimize(
@@ -53,3 +63,4 @@ def run_optimization(train_df: pd.DataFrame, n_trials: int, n_splits: int):
         show_progress_bar=True
     )
     return study
+
