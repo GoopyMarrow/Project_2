@@ -29,3 +29,4 @@ class Operation:
     close_time: pd.Timestamp = None
     close_price: float = None
     pnl: float = 0.0
+
