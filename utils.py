@@ -1,9 +1,23 @@
 import pandas as pd
 
+
 def load_and_split_data(file_path: str, train_ratio: float, test_ratio: float):
-    """Añadir documentacion"""
+    """
+    Carga datos de un archivo CSV, procesa la columna de fecha y los divide
+    en sets de entrenamiento, prueba y validación.
+
+    Args:
+        file_path (str): Ruta al archivo CSV.
+        train_ratio (float): Proporción de datos para el set de entrenamiento (ej. 0.6).
+        test_ratio (float): Proporción de datos para el set de prueba (ej. 0.2).
+
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: Una tupla con los
+        DataFrames de entrenamiento, prueba y validación. Retorna None si el
+        archivo no se encuentra.
+    """
     try:
-        data = pd.read_csv(file_path, skiprows=1) # Para no leer la primera fila que es un link
+        data = pd.read_csv(file_path, skiprows=1)
     except FileNotFoundError:
         print(f"Error: No se encontró el archivo '{file_path}'.")
         return None, None, None
