@@ -1,6 +1,6 @@
 import pandas as pd
 from config import Operation
-from signals import calculate_indicators, generate_signals
+from get_signals import calculate_indicators, generate_signals
 
 
 def run_backtest(df: pd.DataFrame, initial_cash: float, commission: float, params: dict):
