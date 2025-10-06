@@ -32,14 +32,15 @@ def run_backtest(df: pd.DataFrame, initial_cash: float, commission: float, param
     df_with_signals = generate_signals(calculate_indicators(df, params), params)
     pct_cash = params['pct_cash']
 
-    # --- 3. Simulación ---
+    # --- 3. Bucle principal de simulación ---
     for timestamp, row in df_with_signals.iterrows():
         current_price = row['Close']
 
         # --- 3.1. Cierre de Posiciones Abiertas ---
         # Se itera sobre una copia para poder modificar la lista original.
         for position in active_positions[:]:
-            # Cierre de posiciones LONG por SL/TP
+
+            # --- Cierre de posiciones LONG por SL/TP ---
             if position.type == 'LONG' and (
                     current_price >= position.take_profit or current_price <= position.stop_loss):
                 cash += current_price * position.n_shares * (1 - commission)
@@ -47,7 +48,8 @@ def run_backtest(df: pd.DataFrame, initial_cash: float, commission: float, param
                 position.pnl = (current_price - position.open_price) * position.n_shares
                 closed_trades_log.append(position)
                 active_positions.remove(position)
-            # Cierre de posiciones SHORT por SL/TP
+
+            # --- Cierre de posiciones SHORT por SL/TP ---
             elif position.type == 'SHORT' and (
                     current_price <= position.take_profit or current_price >= position.stop_loss):
                 pnl = (position.open_price - current_price) * position.n_shares * (1 - commission)
@@ -68,7 +70,8 @@ def run_backtest(df: pd.DataFrame, initial_cash: float, commission: float, param
         # --- 3.3. Apertura de Nuevas Posiciones ---
         n_shares = (cash * pct_cash) / current_price
         if n_shares > 0:
-            # Apertura de posición LONG
+
+            # --- Apertura de posición LONG ---
             cost_of_long = current_price * n_shares * (1 + commission)
             if row['buy_signal'] and cash >= cost_of_long:
                 cash -= cost_of_long
@@ -77,10 +80,14 @@ def run_backtest(df: pd.DataFrame, initial_cash: float, commission: float, param
                     stop_loss=current_price * (1 - params['stop_loss']),
                     take_profit=current_price * (1 + params['take_profit'])
                 ))
-            # Apertura de posición SHORT
+
+            # --- Apertura de posición SHORT ---
             elif row['sell_signal']:
+                n_longs = sum(1 for p in active_positions if p.type == 'LONG')
+                n_shorts = sum(1 for p in active_positions if p.type == 'SHORT')
                 position_margin = current_price * n_shares * (1 + commission)
-                if cash >= position_margin:
+
+                if (n_shorts + 1) / (n_longs + n_shorts + 1) <= params['max_short_pct'] and cash >= position_margin:
                     cash -= position_margin
                     active_positions.append(Operation(
                         open_time=timestamp, open_price=current_price, n_shares=n_shares, type='SHORT',
