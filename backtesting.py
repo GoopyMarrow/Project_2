@@ -120,3 +120,4 @@ def run_backtest(df: pd.DataFrame, initial_cash: float, commission: float, param
     # --- 5. Retorno de Resultados ---
     portfolio_df = pd.DataFrame(portfolio_history).set_index('timestamp')['value']
     return cash, portfolio_df, closed_trades_log, active_positions
+
