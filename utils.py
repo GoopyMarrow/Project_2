@@ -13,9 +13,9 @@ def load_and_split_data(file_path: str, train_ratio: float, test_ratio: float):
         test_ratio (float): Proporción de datos para el set de prueba (ej. 0.2).
 
     Returns:
-        tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: Una tupla con los
-        DataFrames de entrenamiento, prueba y validación. Retorna (None, None, None)
-        si el archivo no se encuentra.
+        tuple[pd.DataFrame | None, ...]: Una tupla con los DataFrames de
+        entrenamiento, prueba y validación. Retorna (None, None, None) si el
+        archivo no se encuentra.
     """
     try:
         data = pd.read_csv(file_path, skiprows=1)
@@ -40,21 +40,24 @@ def load_and_split_data(file_path: str, train_ratio: float, test_ratio: float):
 def display_final_results(dataset_name: str, initial_cash: float, portfolio: pd.Series,
                           log: list, best_params: dict):
     """
-    Imprime un reporte formateado con los resultados del backtest para un
-    set de datos específico (Train, Test, o Validation).
+    Imprime un reporte formateado con los resultados del backtest para un set de datos.
+
+    Muestra los hiperparámetros utilizados (solo para el set 'Train'), el
+    rendimiento del portafolio y un desglose de las métricas de desempeño.
 
     Args:
-        dataset_name (str): Nombre del set de datos (ej. "Train").
-        initial_cash (float): Capital inicial para ese periodo.
-        portfolio (pd.Series): Serie temporal del valor del portafolio.
-        log (list): Lista de operaciones cerradas.
-        best_params (dict): Diccionario con los hiperparámetros óptimos utilizados.
+        dataset_name (str): Nombre del set de datos (ej. "Train") para el título del reporte.
+        initial_cash (float): Capital inicial del periodo evaluado.
+        portfolio (pd.Series): Serie temporal del valor del portafolio para el periodo.
+        log (list): Lista de objetos `Operation` cerrados durante el periodo.
+        best_params (dict): Diccionario con los hiperparámetros óptimos utilizados
+                            en la simulación.
     """
     final_metrics = calculate_full_performance_metrics(portfolio, log, 60)
 
     print(f"\n--- Métricas con Parámetros Óptimos ({dataset_name}) ---")
 
-    # Imprimir los hiperparámetros solo para el primer reporte (Train)
+    # Imprimir los hiperparámetros solo en el primer reporte (Train)
     if dataset_name == "Train":
         print("\nMejores Hiperparámetros Utilizados:")
         for key, value in best_params.items():
@@ -76,3 +79,4 @@ def display_final_results(dataset_name: str, initial_cash: float, portfolio: pd.
     # Imprimir el resto de las métricas
     for key, value in final_metrics.items():
         print(f"- {key}: {value}")
+
