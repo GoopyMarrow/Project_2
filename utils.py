@@ -1,5 +1,5 @@
 import pandas as pd
-from metrics import calculate_full_performance_metrics
+from metrics import calculate_full_performance_metrics, generate_returns_table
 
 
 def load_and_split_data(file_path: str, train_ratio: float, test_ratio: float):
@@ -79,4 +79,15 @@ def display_final_results(dataset_name: str, initial_cash: float, portfolio: pd.
     # Imprimir el resto de las métricas
     for key, value in final_metrics.items():
         print(f"- {key}: {value}")
+
+    # Imprimir la tabla de rendimientos periódicos
+    if not portfolio.empty:
+        returns_tables = generate_returns_table(portfolio)
+        print("\n--- Rendimientos Periódicos ---")
+        for period_name, returns_series in returns_tables.items():
+            if not returns_series.empty:
+                print(f"\n{period_name}:")
+                # Formatear la serie para mostrarla como tabla
+                formatted_series = returns_series.map('{:.2%}'.format)
+                print(formatted_series.to_string())
 
