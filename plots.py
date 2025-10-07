@@ -11,6 +11,20 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(
     color=["skyblue", "steelblue", "navy", "royalblue", "mediumslateblue"]
 )
 
+def plot_single_period_performance(portfolio_values: pd.Series, title: str):
+    """
+    Grafica el rendimiento del portafolio para un único periodo.
+
+    Args:
+        portfolio_values (pd.Series): Serie del valor del portafolio.
+        title (str): El título para el gráfico.
+    """
+    plt.figure()
+    portfolio_values.plot(title=title)
+    plt.xlabel('Fecha')
+    plt.ylabel('Valor del Portafolio (USD)')
+    plt.show()
+
 
 def plot_performance_vs_buy_and_hold(strategy_portfolio: pd.Series, price_data: pd.Series, initial_cash: float):
     """
@@ -51,19 +65,5 @@ def plot_split_performance(test_portfolio: pd.Series, validation_portfolio: pd.S
     plt.xlabel('Fecha')
     plt.ylabel('Valor del Portafolio (USD)')
     plt.legend()
-    plt.show()
-
-
-def plot_training_performance(portfolio_values: pd.Series):
-    """
-    Grafica el rendimiento del portafolio durante el periodo de entrenamiento.
-
-    Args:
-        portfolio_values (pd.Series): Serie del valor del portafolio en el set de entrenamiento.
-    """
-    plt.figure()
-    portfolio_values.plot(title='Rendimiento en Entrenamiento')
-    plt.xlabel('Fecha')
-    plt.ylabel('Valor del Portafolio (USD)')
     plt.show()
 
