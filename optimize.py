@@ -36,7 +36,7 @@ def get_params_from_trial(trial: optuna.trial.Trial) -> dict:
         'take_profit': trial.suggest_float('take_profit', 0.01, 0.15),
         # 'n_shares': trial.suggest_float('n_shares', 0.5, 10.0), # No da resultados buenos
         'pct_cash': trial.suggest_float('pct_cash', 0.001, 0.250, step=0.001), # Da mejores resultados
-        'max_short_pct': trial.suggest_float('max_short_pct', 0.1, 0.5)
+        'max_short_pct': trial.suggest_float('max_short_pct', 0.1, 0.45, step=0.01)
     }
 
 
