@@ -90,3 +90,29 @@ def calculate_full_performance_metrics(portfolio_values: pd.Series, trades_log: 
     }
     return {key: round(value, 4) for key, value in metrics.items()}
 
+
+def generate_returns_table(portfolio_values: pd.Series) -> dict:
+    """
+    Calcula los rendimientos periódicos (mensual, cuatrimestral, anual).
+
+    Args:
+        portfolio_values (pd.Series): La serie temporal del valor del portafolio.
+
+    Returns:
+        dict: Un diccionario con DataFrames de rendimientos para cada periodo.
+    """
+    # Usar pct_change diario como base para componer los rendimientos
+    daily_returns = portfolio_values.resample('D').last().pct_change().dropna()
+
+    # Calcular rendimientos para cada periodo
+    monthly = daily_returns.resample('ME').apply(lambda x: (1 + x).prod() - 1)
+    quarterly = daily_returns.resample('4ME').apply(lambda x: (1 + x).prod() - 1)  # 4ME para cuatrimestral
+    annually = daily_returns.resample('YE').apply(lambda x: (1 + x).prod() - 1)
+
+    returns_dict = {
+        "Mensual": monthly,
+        "Cuatrimestral": quarterly,
+        "Anual": annually
+    }
+    return returns_dict
+
